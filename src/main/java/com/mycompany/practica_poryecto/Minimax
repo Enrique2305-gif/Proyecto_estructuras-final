@@ -1,0 +1,96 @@
+public class Minimax {
+    public static double utility(Nodo_Tablero node, char player) {
+        Tablero board = node.getContent();
+        if (board.verificarGanador()) {
+            if (board.getTurno() == player) {
+                return 1; // El jugador actual ha ganado
+            } else {
+                return -1; // El oponente ha ganado
+            }
+        }
+        
+        if (board.esEmpate()) {
+            return 0; // Es empate
+        }
+        
+        return evaluateBoard(board, player);
+    }
+
+    private static double evaluateBoard(Tablero board, char player) {
+        double score = 0;
+        
+        for (int i = 0; i < 3; i++) {
+            score += evaluateLine(board, i, 0, 0, 1, player); // Filas
+            score += evaluateLine(board, 0, i, 1, 0, player); // Columnas
+        }
+        score += evaluateLine(board,  0, 0, 1, 1, player); // Diagonal principal
+        score += evaluateLine(board, 0, 2, 1, -1, player); // Diagonal secundaria
+        
+        return score;
+    }
+
+    private static double evaluateLine(Tablero board, int startX, int startY, int dx, int dy, char player) {
+        int playerCount = 0;
+        int opponentCount = 0;
+
+        for (int i = 0; i < 3; i++) {
+            int x = startX + i * dx;
+            int y = startY + i * dy;
+            char currentPiece = board.getCasilla(x, y);
+
+            if (currentPiece == player) {
+                playerCount++;
+            } else if (currentPiece != ' ') {
+                opponentCount++;
+            }
+        }
+
+        if (playerCount == 3) {
+            return 1; // El jugador gana en esta línea
+        } else if (opponentCount == 3) {
+            return -1; // El oponente gana en esta línea
+        } else {
+            return playerCount - opponentCount; // Puntuación relativa
+        }
+    }
+
+    public static double minimax(Nodo_Tablero node, boolean maximizing, char originalPlayer) {
+        if (node.getContent().verificarGanador() || node.getContent().esEmpate()) {
+            return utility(node, originalPlayer); // Utiliza la nueva función de utilidad
+        }
+        
+        if (maximizing) {
+            double v = Double.NEGATIVE_INFINITY;
+            node.generarPosiblesEstados();
+            for (Nodo_Tablero child : node.getHijos()) {
+                double result = minimax(child, false, originalPlayer);
+                v = Math.max(v, result);
+            }
+            return v;
+        } else {
+            double v = Double.POSITIVE_INFINITY;
+            node.generarPosiblesEstados();
+            for (Nodo_Tablero child : node.getHijos()) {
+                double result = minimax(child, true, originalPlayer);
+                v = Math.min(v, result);
+            }
+            return v;
+        }
+    }
+
+    public static Integer findBestMove(Nodo_Tablero rootNode) {
+        double bestValue = Double.NEGATIVE_INFINITY;
+        Integer bestMove = null;
+
+        rootNode.generarPosiblesEstados();
+        for (Nodo_Tablero child : rootNode.getHijos()) {
+            double result = minimax(child, false, rootNode.getContent().getTurno());
+            if (result > bestValue) {
+                bestValue = result;
+                bestMove = child.getMoveIndex(); // El movimiento que maximiza la utilidad
+            }
+        }
+
+        return bestMove;
+    }
+}
