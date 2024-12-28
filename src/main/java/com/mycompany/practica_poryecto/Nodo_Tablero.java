@@ -12,25 +12,31 @@ import java.util.LinkedList;
  */
 public class Nodo_Tablero {
     private Tablero content;
-    private LinkedList<Tree> hijos;
+    private LinkedList<Nodo_Tablero> hijos;
+    private Integer moveIndex; 
+    
     
     public Nodo_Tablero() {
         this.content = null;
         this.hijos = null;
+        this.moveIndex = null;
     }
 
     public Nodo_Tablero(Tablero content) {
         this.content = content;
         this.hijos = new LinkedList<>();
+        this.moveIndex = moveIndex;
     }
 
     public Tablero getContent() {
         return content;
     }
 
-    public LinkedList<Tree> getHijos() {
+    
+    public LinkedList<Nodo_Tablero> getHijos() {
         return hijos;
     }
+    
     
     private Tablero copiarTablero(Tablero original) {
         Tablero copia = new Tablero();
@@ -42,7 +48,7 @@ public class Nodo_Tablero {
         return copia;
     }
     
-    public void agregarHijo(Tree hijo) {
+    public void agregarHijo(Nodo_Tablero hijo) {
         hijos.add(hijo);
     }
     
@@ -59,7 +65,7 @@ public class Nodo_Tablero {
                     nuevoTablero.cambiarTurno(); // Cambiar el turno para el siguiente jugador
 
                     // Crear un nuevo subárbol para el nuevo tablero
-                    Tree nuevoArbol = new Tree(nuevoTablero);
+                    Nodo_Tablero nuevoArbol = new Tree(nuevoTablero);
                     this.agregarHijo(nuevoArbol); // Añadir el subárbol como hijo
                 }
             }
